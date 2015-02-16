@@ -2,6 +2,7 @@ __author__ = 'eirikvageskar'
 
 import numpy as np
 
+
 def normalize(a):
     """Normalizes a numpy array so that the sum of the elements is 1.
 
@@ -9,6 +10,7 @@ def normalize(a):
     :return: The normalized array
     """
     return a*1/a.sum()
+
 
 def forward(t, o, f):
     """Computes one HMM forward step and normalizes the vector.
@@ -22,6 +24,7 @@ def forward(t, o, f):
     temp = o*t.transpose()*f
     return normalize(temp)
 
+
 def backward(t, o, b):
     """Computes one HMM backward step
 
@@ -32,6 +35,7 @@ def backward(t, o, b):
     """
 
     return t*o*b
+
 
 def forward_with_observations(t, obs_dict, f, observations):
     """
@@ -49,6 +53,7 @@ def forward_with_observations(t, obs_dict, f, observations):
             print "\nf1:" + str(i+1) + "\n", f
 
     return f
+
 
 def forward_backward(t, obs_dict, f, observations):
     """An implementation of the forward-backward algorithm on page, fig 14.4 on p. 576 of Artificial Intelligence:
@@ -79,7 +84,6 @@ def forward_backward(t, obs_dict, f, observations):
             print "\nb" + str(len(sv)-i) + ":" + str(len(sv)) + "\n", b
 
     return sv
-
 
 
 if __name__ == "__main__":
