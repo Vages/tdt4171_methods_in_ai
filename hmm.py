@@ -38,7 +38,8 @@ def backward(t, o, b):
 
 
 def forward_with_observations(t, obs_dict, f, observations):
-    """
+    """Uses a list of observations along with a dictionary containing the observation values for given evidence to
+    compute a forward value.
 
     :param t: Transition model
     :param obs_dict: A dictionary of observation matrices for different observation values
