@@ -51,7 +51,7 @@ def forward_with_observations(t, obs_dict, f, observations):
     for i in range(len(observations)):
         f = forward(t, obs_dict[observations[i]], f)
         if show_normalized:
-            print "\nf1:" + str(i+1) + "\n", f
+            print '\nf1:' + str(i+1) + '\n', f
 
     return f
 
@@ -72,9 +72,9 @@ def forward_backward(t, obs_dict, f, observations):
     for i in range(len(observations)):
         fv.append(forward(t, obs_dict[observations[i]], fv[i]))
 
-    sv = [np.matrix("1; 1")]*(len(fv)-1)
+    sv = [np.matrix('1; 1')]*(len(fv)-1)
 
-    b = np.matrix("1; 1")
+    b = np.matrix('1; 1')
 
     for i in range(len(sv)):
         j = -(i+1)
@@ -82,13 +82,13 @@ def forward_backward(t, obs_dict, f, observations):
 
         b = backward(t, obs_dict[observations[j]], b)
         if show_backward:
-            print "\nb" + str(len(sv)-i) + ":" + str(len(sv)) + "\n", b
+            print '\nb' + str(len(sv)-i) + ':' + str(len(sv)) + '\n', b
 
     return sv
 
 
-if __name__ == "__main__":
-    print "Part B\nTask 1"
+if __name__ == '__main__':
+    print 'Part B\nTask 1'
 
     t = np.matrix('0.7 0.3; 0.3 0.7')
     f = np.matrix('0.5; 0.5')
@@ -99,25 +99,25 @@ if __name__ == "__main__":
     show_normalized = False
 
     fwo1 = forward_with_observations(t, obs_dict, f, ['t', 't'])
-    print "\nProb. vector on day 2, given (t, t):\n", fwo1
+    print '\nProb. vector on day 2, given (t, t):\n', fwo1
 
-    print "\nTask2"
+    print '\nTask2'
 
     show_normalized = True
 
     fwo2 = forward_with_observations(t, obs_dict, f, ['t', 't', 'f', 't', 't'])
-    print "\nProb. of rain on day five given (t, t, f, t, t):\n", fwo2[0, 0]
+    print '\nProb. of rain on day five given (t, t, f, t, t):\n', fwo2[0, 0]
 
-    print "\nPart C\nTask 1"
+    print '\nPart C\nTask 1'
 
     show_backward = False
 
     fb1 = forward_backward(t, obs_dict, f, ['t', 't'])
-    print "\nValue of X1 after smoothing:\n", fb1[0]
+    print '\nValue of X1 after smoothing:\n', fb1[0]
 
-    print "\nTask 2"
+    print '\nTask 2'
 
     show_backward = True
 
     fb2 = forward_backward(t, obs_dict, f, ['t', 't', 'f', 't', 't'])
-    print "\nProb of rain in X1 after long smoothing:\n", fb2[0]
+    print '\nProb of rain in X1 after long smoothing:\n', fb2[0]
