@@ -25,19 +25,20 @@ def decision_tree_learning(examples, example_numbers, attribute_set, parent_exam
 
     Builds on fig. 18.5 from Artificial Intelligence: A modern approach.
 
-    :param examples: The set of examples to be examined.
+    :param examples: The complete set of examples to work on.
+    :param example_numbers: The indices of the examples to be examined.
     :param attribute_set: The set of attributes still to be decided on.
-    :param parent_examples: The examples
+    :param parent_example_numbers: The example_numbers
     :return:
     """
-    if len(examples) == 0:
-        return plurality_value(parent_examples)
+    if len(example_numbers) == 0:
+        return plurality_value(parent_example_numbers)
     if len(attribute_set) == 0:
-        return plurality_value(examples)
+        return plurality_value(example_numbers)
 
     max_importance = -1
     for a in attribute_set:
-        a_importance = importance(a, examples)
+        a_importance = importance(a, example_numbers)
         if a_importance > max_importance:
             max_importance = a_importance
             argmax = a
@@ -61,6 +62,14 @@ def read_examples(filepath):
         examples.append(line.split())
 
     return examples
+
+if __name__ == "__main__":
+    exes = read_examples("data/test.txt")
+    ex_nos = [i for i in range(len(exes))]
+
+    ex_nos = set(ex_nos)
+
+    print plurality_value(exes, ex_nos)
 
 
 
