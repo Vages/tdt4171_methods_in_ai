@@ -12,9 +12,9 @@ def plurality_value(examples, example_numbers):
 
     for i in example_numbers:
         result = examples[i][-1]
-        try:
+        if result in counts:
             counts[result] += 1
-        except KeyError:
+        else:
             counts[result] = 1
 
     return max(counts, key=lambda x: counts[x])
