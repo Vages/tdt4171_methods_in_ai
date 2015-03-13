@@ -36,7 +36,7 @@ def read_examples(filepath):
     :param filepath: Filepath or filename.
     :return: Example list
     """
-    f = open("test.txt")
+    f = open(filepath)
     examples = []
     for line in f:
         examples.append(line.split())
