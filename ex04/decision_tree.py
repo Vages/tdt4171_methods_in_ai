@@ -32,9 +32,9 @@ def decision_tree_learning(examples, example_numbers, attribute_set, parent_exam
     :return:
     """
     if len(example_numbers) == 0:
-        return plurality_value(parent_example_numbers)
+        return plurality_value(examples, parent_example_numbers)
     if len(attribute_set) == 0:
-        return plurality_value(example_numbers)
+        return plurality_value(examples, example_numbers)
 
     max_importance = -1
     for a in attribute_set:
