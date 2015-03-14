@@ -1,4 +1,6 @@
 __author__ = 'eirikvageskar'
+import random
+import math
 
 
 def plurality_value(examples, example_numbers):
