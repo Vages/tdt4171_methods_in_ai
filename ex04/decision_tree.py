@@ -58,6 +58,29 @@ def find_true_count(examples, example_numbers):
     return true_count
 
 
+def remainder(examples, example_numbers, a):
+    """
+    Finds expected entropy after testing attribute a.
+
+    :param examples: The entire set of examples.
+    :param example_numbers: The subset in question.
+    :param a: The attribute in question.
+    :return: Expected remaining entropy.
+    """
+
+    values = find_values_and_example_numbers(examples, example_numbers, a)
+
+    remainder_sum = 0
+    p_plus_n = len(example_numbers)
+    for k in values:
+        pk_plus_nk = len(values[k])
+        pk = find_true_count(examples, values[k])
+        boolean_entropy_of_k_set = boolean_entropy(pk/pk_plus_nk)
+        remainder_sum += (pk_plus_nk/p_plus_n)*boolean_entropy_of_k_set
+
+    return remainder_sum
+
+
 
 def random_importance(examples, example_numbers, a):
     """
