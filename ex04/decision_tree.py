@@ -4,7 +4,8 @@ import math
 
 
 def plurality_value(examples, example_numbers):
-    """Finds the most common output value (i.e. last value) among a set of examples.
+    """
+    Finds the most common output value (i.e. last value) among a set of examples.
 
     :param examples: The complete set of examples.
     :param example_numbers: The examples to be examined.
@@ -23,7 +24,8 @@ def plurality_value(examples, example_numbers):
 
 
 def boolean_entropy(q):
-    """Boolean entropy for a variable with probability q of being true
+    """
+    Boolean entropy for a variable with probability q of being true
 
     :param q: The probability of the variable being true
     :return: Boolean entropy
@@ -33,7 +35,9 @@ def boolean_entropy(q):
 
 
 def find_true_count(examples, example_numbers):
-    """Finds the proportion of true results in the subset.
+    """
+    Finds the number of true results in the subset.
+    True is assumed to be the largest of the result values.
 
     :param examples: The entire set of examples.
     :param example_numbers: The subset in question.
@@ -55,7 +59,8 @@ def find_true_count(examples, example_numbers):
 
 
 def random_importance(examples, example_numbers, a):
-    """A sheep function in wolf's clothing: Returns a random number.
+    """
+    A sheep function in wolf's clothing: Returns a random number.
 
     :param examples:
     :param example_numbers:
@@ -70,7 +75,8 @@ def information_gain(examples, example_numbers, a):
 
 
 def find_values_and_example_numbers(examples, example_numbers, attribute):
-    """Finds the possible values of attribute a in subset of examples given by example numbers
+    """
+    Finds the possible values of attribute a in subset of examples given by example numbers
 
     :param examples: The examples
     :param example_numbers: Example indices
@@ -90,7 +96,8 @@ def find_values_and_example_numbers(examples, example_numbers, attribute):
 
 
 def decision_tree_learning(examples, example_numbers, attribute_set, parent_example_numbers, importance):
-    """Returns a decision tree.
+    """
+    Returns a decision tree.
 
     Builds on fig. 18.5 from Artificial Intelligence: A modern approach.
 
@@ -139,7 +146,8 @@ def decision_tree_learning(examples, example_numbers, attribute_set, parent_exam
 
 
 def read_examples(filepath):
-    """Read examples from a file and put them in a list.
+    """
+    Read examples from a file and put them in a list.
 
     :param filepath: Filepath or filename.
     :return: Example list
