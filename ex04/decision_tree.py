@@ -92,7 +92,21 @@ def random_importance(examples, example_numbers, a):
 
 
 def information_gain(examples, example_numbers, a):
-    pass
+    """
+    Finds the information gain of splitting the subset using attribute a.
+
+    :param examples: The entire set of examples.
+    :param example_numbers: The subset in question.
+    :param a: The attribute in question.
+    :return: Information gain.
+    """
+
+    probability_of_true = find_true_count(examples, example_numbers)/len(example_numbers)
+    b = boolean_entropy(probability_of_true)
+
+    remainder_of_a = remainder(examples, example_numbers, a)
+
+    return b - remainder_of_a
 
 
 def find_values_and_example_numbers(examples, example_numbers, attribute):
