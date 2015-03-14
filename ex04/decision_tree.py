@@ -259,42 +259,25 @@ def test_for_accuracy(decision_tree, test_set):
     return len(erroneous_indices)/len(test_set), erroneous_indices
 
 
-"""
-The following two functions are reused from the web and are used for drawing a tree of the dict.
-Source: http://stackoverflow.com/questions/13688410/dictionary-object-to-decision-tree-in-pydot
-"""
-menu = {'dinner':
-            {'chicken':'good',
-             'beef':'average',
-             'vegetarian':{
-                   'tofu':'good',
-                   'salad':{
-                            'caeser':'bad',
-                            'italian':'average'}
-                   },
-             'pork':'bad'}
-        }
+def build_graph(graph, node, address=""):
+    if graph is None:
+        graph = pydot.Dot(graph_type='digraph')
 
-
-def draw(parent_name, child_name, text=""):
-    edge = pydot.Edge(parent_name, child_name, label=label)
-    graph.add_edge(edge)
-
-
-def visit(node, parent=None):
-    for k in node:
-        v = node[k]
-        if isinstance(v, dict):
-            # We start with the root node whose parent is None
-            # we don't want to graph the None node
-            if parent:
-                draw(parent, k)
-            visit(v, k)
+    this_node = pydot.Node(address, label=node["root_test"])
+    graph.add_node(this_node)
+    for key in node:
+        if key == 'root_test':
+            continue
+        value = node[key]
+        child_address = address+"."+str(key)
+        if type(value) is dict:
+            graph.add_edge(pydot.Edge(this_node, build_graph(graph, value, child_address), label=key))
         else:
-            draw(parent, k)
-            # drawing the label using a distinct name
-            draw(k, str(k)+'_'+str(v))
+            classification_node = pydot.Node(child_address, label=value, shape="rectangle")
+            graph.add_node(classification_node)
+            graph.add_edge(pydot.Edge(this_node, classification_node, label=key))
 
+    return this_node
 
 
 if __name__ == "__main__":
@@ -326,5 +309,5 @@ if __name__ == "__main__":
         print(item)
 
     graph = pydot.Dot(graph_type='digraph')
-    visit(menu)
+    build_graph(graph, bad_decision_tree)
     graph.write('example1_graph.eps', format="eps")
