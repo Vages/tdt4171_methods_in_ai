@@ -260,19 +260,27 @@ def test_for_accuracy(decision_tree, test_set):
 
 
 def build_graph(graph, node, address=""):
-    if graph is None:
-        graph = pydot.Dot(graph_type='digraph')
+    """Builds a graph of the decision tree in the dot language recursively.
+    This depends on the pydot library (pydot3k, to be exact), which again depends on GraphViz.
 
-    this_node = pydot.Node(address, label=node["root_test"])
-    graph.add_node(this_node)
-    for key in node:
-        if key == 'root_test':
+    :param graph: The graph we are working with. Must be declared from the outside.
+    :param node: The node being examined (a dictionary).
+    :param address: The address of this node (sequence of attribute values thus far; a unique address)
+    :return: The pydot Node being that has been constructed for this dictionary node. Necessary for recursion.
+    """
+
+    this_node = pydot.Node(address, label=node["root_test"])  # Construct this node
+    graph.add_node(this_node)  # Add it to the graph
+    for key in node:  # For all keys
+        if key == 'root_test':  # ... except the one telling us which attribute is being tested
             continue
         value = node[key]
-        child_address = address+"."+str(key)
+        child_address = address+"."+str(key)  # Make a unique address for the child node
         if type(value) is dict:
+            # Build the graph for the child and then connect the parent node to it
             graph.add_edge(pydot.Edge(this_node, build_graph(graph, value, child_address), label=key))
         else:
+            # The child is a classification leaf node. It needs no subgraph building
             classification_node = pydot.Node(child_address, label=value, shape="rectangle")
             graph.add_node(classification_node)
             graph.add_edge(pydot.Edge(this_node, classification_node, label=key))
@@ -300,14 +308,18 @@ if __name__ == "__main__":
         good_accuracies.append(test_for_accuracy(good_decision_tree, test_examples))
         bad_accuracies.append(test_for_accuracy(bad_decision_tree, test_examples))
 
-    print("Good accuracies and erroneous indices")
+    print("Information gain accuracies and erroneous indices")
     for item in good_accuracies:
         print(item)
 
-    print("Bad accuracies and erroneous indices")
+    print("\nRandom importance accuracies and erroneous indices")
     for item in bad_accuracies:
         print(item)
 
-    graph = pydot.Dot(graph_type='digraph')
-    build_graph(graph, bad_decision_tree)
-    graph.write('example1_graph.eps', format="eps")
+    good_graph = pydot.Dot(graph_type='digraph')
+    build_graph(good_graph, good_decision_tree)
+    good_graph.write('good_decision_tree.eps', format="eps")
+
+    bad_graph = pydot.Dot(graph_type='digraph')
+    build_graph(bad_graph, bad_decision_tree)
+    bad_graph.write('bad_decision_tree.eps', format='eps')
