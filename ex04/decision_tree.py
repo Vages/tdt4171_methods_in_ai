@@ -36,8 +36,10 @@ def boolean_entropy(q):
     :return: Boolean entropy
     """
 
-    #Todo: If conversion to Python3, replace log with log2 function.
-    return -(q*math.log2(q)+(1-q)*math.log2(1-q))
+    try:
+        return -(q*math.log2(q)+(1-q)*math.log2(1-q))
+    except ValueError:
+        return 0
 
 
 def find_true_count(examples, example_numbers):
