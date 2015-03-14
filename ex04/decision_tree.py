@@ -104,7 +104,8 @@ def decision_tree_learning(examples, example_numbers, attribute_set, parent_exam
     :param examples: The complete set of examples to work on.
     :param example_numbers: The indices of the examples to be examined.
     :param attribute_set: The set of attributes still to be decided on.
-    :param parent_example_numbers: The example_numbers
+    :param parent_example_numbers: The example_numbers of this branch's parent.
+    :param importance: Function used to judge importance of an attribute.
     :return:
     """
     if len(example_numbers) == 0:
