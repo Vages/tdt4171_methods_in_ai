@@ -65,6 +65,10 @@ def random_importance(examples, example_numbers, a):
     return random.random()
 
 
+def information_gain(examples, example_numbers, a):
+    pass
+
+
 def find_values_and_example_numbers(examples, example_numbers, attribute):
     """Finds the possible values of attribute a in subset of examples given by example numbers
 
