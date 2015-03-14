@@ -32,7 +32,7 @@ def boolean_entropy(q):
     return -(q*math.log(q, 2)+(1-q)*log((1-q), 2))
 
 
-def find_true_proportion(examples, example_numbers):
+def find_true_count(examples, example_numbers):
     """Finds the proportion of true results in the subset.
 
     :param examples: The entire set of examples.
@@ -50,7 +50,7 @@ def find_true_proportion(examples, example_numbers):
         if examples[e][-1] == true_value:
             true_count += 1
 
-    return true_count/len(example_numbers)
+    return true_count
 
 
 
