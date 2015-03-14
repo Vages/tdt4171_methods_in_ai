@@ -43,8 +43,8 @@ def boolean_entropy(q):
 
     try:
         return -(q*math.log2(q)+(1-q)*math.log2(1-q))
-    except ValueError:
-        return 0
+    except ValueError:  # Happens if Q is 1 or 0, which causes a problem with the logarithm.
+        return 0        # 0 is a safe choice here due to the nature of the problem.
 
 
 def find_true_count(examples, example_numbers):
