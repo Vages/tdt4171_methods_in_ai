@@ -123,7 +123,7 @@ def find_values_and_example_numbers(examples, example_numbers, attribute):
     for e in example_numbers:       # For every example number in questien
         v = examples[e][attribute]
         if v in values:
-            values[v].add(e)        # Add example number e to the set of examples.
+            values[v].add(e)        # Add example number e to the set of training_set.
         else:
             values[v] = {e}         # If set doesn't exist, make a new one.
 
@@ -149,7 +149,7 @@ def decision_tree_learning(examples, example_numbers, attribute_set, parent_exam
     random_index = random.sample(example_numbers, 1)[0]
     random_result = examples[random_index][-1]
 
-    for e in example_numbers:  # Check if all examples have same classification
+    for e in example_numbers:  # Check if all training_set have same classification
         if examples[e][-1] != random_result:
             break
     else:
@@ -170,7 +170,7 @@ def decision_tree_learning(examples, example_numbers, attribute_set, parent_exam
     # Construct a new tree to be returned
     tree = {"root_test": argmax}
 
-    # Find values of argmax-attribute and the examples that take on those values
+    # Find values of argmax-attribute and the training_set that take on those values
     values = find_values_and_example_numbers(examples, example_numbers, argmax)
 
     new_attribute_set = attribute_set.difference([argmax])
@@ -195,14 +195,32 @@ def read_examples(file_path):
 
     return examples
 
+
+def classify(decision_tree, example):
+    """
+    Classifies the given specimen according to the decision tree.
+
+    :param decision_tree: A decision tree (or leaf node)
+    :param example: The specimen
+    :return: Classification
+    """
+
+    if type(decision_tree) is not dict:  # We have reached a leaf node
+        return decision_tree
+
+    test_attribute = decision_tree["root_test"]
+    classify(decision_tree[example[test_attribute]], example)
+
 if __name__ == "__main__":
-    exes = read_examples("data/test.txt")
-    ex_nos = [i for i in range(len(exes))]
+    training_set = read_examples("data/training.txt")
+    example_numbers_set = set([i for i in range(len(training_set))])
 
-    ex_nos = set(ex_nos)
+    number_of_attributes = len(exes[0])-1
+    attribute_set = set([i for i in range(number_of_attributes)])
 
-    print plurality_value(exes, ex_nos)
+    our_decision_tree = decision_tree_learning(training_set, example_numbers_set, attribute_set, None, information_gain)
 
-
+    test_examples = read_examples("data/test.txt")
+    training_numbers_set = set([i for i in range(len(test_examples))])
 
 
