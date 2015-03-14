@@ -125,13 +125,15 @@ def find_values_and_example_numbers(examples, example_numbers, attribute):
     :return: A dictionary containing attributes and sets of examples
     """
     values = {}
+
+    for ex in examples:
+        val = ex[attribute]
+        if val not in values:
+            values[val] = set()
     
     for e in example_numbers:       # For every example number in questien
         v = examples[e][attribute]
-        if v in values:
-            values[v].add(e)        # Add example number e to the set of training_set.
-        else:
-            values[v] = {e}         # If set doesn't exist, make a new one.
+        values[v].add(e)        # Add example number e to the set of training_set.
 
     return values
 
