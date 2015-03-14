@@ -108,6 +108,9 @@ def decision_tree_learning(examples, example_numbers, attribute_set, parent_exam
             max_importance = a_importance
             argmax = a
 
+    #Find values of argmax-attribute and the examples that take on those values
+    vals = find_values_and_example_numbers(examples, example_numbers, argmax)
+
     tree = {"root_test": argmax}
 
     #We need some recursive loop here.
