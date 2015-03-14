@@ -23,6 +23,16 @@ def plurality_value(examples, example_numbers):
 
 
 def decision_tree_learning(examples, example_numbers, attribute_set, parent_example_numbers):
+def boolean_entropy(q):
+    """Boolean entropy for a variable with probability q of being true
+
+    :param q: The probability of the variable being true
+    :return: Boolean entropy
+    """
+
+    return -(q*math.log(q, 2)+(1-q)*log((1-q), 2))
+
+
 def find_true_proportion(examples, example_numbers):
     """Finds the proportion of true results in the subset.
 
