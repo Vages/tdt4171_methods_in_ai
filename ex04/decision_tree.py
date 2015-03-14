@@ -23,6 +23,25 @@ def plurality_value(examples, example_numbers):
 
 
 def decision_tree_learning(examples, example_numbers, attribute_set, parent_example_numbers):
+def find_true_proportion(examples, example_numbers):
+    """Finds the proportion of true results in the subset.
+
+    :param examples: The entire set of examples.
+    :param example_numbers: The subset in question.
+    :return: The proportion of true variables.
+    """
+
+    # The value for "True" is expected to be the highest of the result values.
+    # This function should never be run if there is only one kind of value in the results.
+
+    true_value = max(examples, key=lambda x: x[-1])[-1]
+
+    true_count = 0
+    for e in example_numbers:
+        if examples[e][-1] == true_value:
+            true_count += 1
+
+    return true_count/len(example_numbers)
     """Returns a decision tree.
 
     Builds on fig. 18.5 from Artificial Intelligence: A modern approach.
