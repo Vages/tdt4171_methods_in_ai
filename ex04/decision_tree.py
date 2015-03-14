@@ -54,6 +54,26 @@ def random_importance(examples, example_numbers, a):
     :return:
     """
     return random.random()
+
+
+def find_values_and_example_numbers(examples, example_numbers, attribute):
+    """Finds the possible values of attribute a in subset of examples given by example numbers
+
+    :param examples: The examples
+    :param example_numbers: Example indices
+    :param attribute: The attribute to be examined
+    :return: A dictionary containing attributes and sets of examples
+    """
+    values = {}
+    
+    for e in example_numbers:       # For every example number in questien
+        v = examples[e][attribute]
+        if v in values:
+            values[v].add(e)        # Add example number e to the set of examples.
+        else:
+            values[v] = {e}         # If set doesn't exist, make a new one.
+
+    return values
     """Returns a decision tree.
 
     Builds on fig. 18.5 from Artificial Intelligence: A modern approach.
