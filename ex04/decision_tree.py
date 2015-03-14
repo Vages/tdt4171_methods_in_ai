@@ -130,6 +130,24 @@ def find_values_and_example_numbers(examples, example_numbers, attribute):
     return values
 
 
+def have_same_classification(examples, example_numbers):
+    """
+    Helper method that checks if all examples in the subset have the same classification
+
+    :param examples:
+    :param example_numbers:
+    :return:
+    """
+    random_index = random.sample(example_numbers, 1)[0]
+    random_result = examples[random_index][-1]
+
+    for e in example_numbers:  # Check if all examples have same classification
+        if examples[e][-1] != random_result:
+            return False
+
+    return random_result
+
+
 def decision_tree_learning(examples, example_numbers, attribute_set, parent_example_numbers, importance):
     """
     Returns a decision tree.
@@ -146,14 +164,9 @@ def decision_tree_learning(examples, example_numbers, attribute_set, parent_exam
     if len(example_numbers) == 0:  # Examples is empty
         return plurality_value(examples, parent_example_numbers)
 
-    random_index = random.sample(example_numbers, 1)[0]
-    random_result = examples[random_index][-1]
-
-    for e in example_numbers:  # Check if all training_set have same classification
-        if examples[e][-1] != random_result:
-            break
-    else:
-        return random_result
+    same_classification_check = have_same_classification(examples, example_numbers)
+    if same_classification_check:
+        return same_classification_check
 
     if len(attribute_set) == 0:  # Attribute set is empty
         return plurality_value(examples, example_numbers)
