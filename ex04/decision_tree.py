@@ -2,6 +2,10 @@ __author__ = 'eirikvageskar'
 import random
 import math
 
+"""
+Made for Python3
+"""
+
 
 def plurality_value(examples, example_numbers):
     """
@@ -33,7 +37,7 @@ def boolean_entropy(q):
     """
 
     #Todo: If conversion to Python3, replace log with log2 function.
-    return -(q*math.log(q, 2)+(1-q)*log((1-q), 2))
+    return -(q*math.log2(q)+(1-q)*math.log2(1-q))
 
 
 def find_true_count(examples, example_numbers):
@@ -226,14 +230,22 @@ def classify(decision_tree, example):
 
 if __name__ == "__main__":
     training_set = read_examples("data/training.txt")
-    example_numbers_set = set([i for i in range(len(training_set))])
+    training_numbers_set = set([i for i in range(len(training_set))])
 
-    number_of_attributes = len(exes[0])-1
+    number_of_attributes = len(training_set[0])-1
     attribute_set = set([i for i in range(number_of_attributes)])
 
-    our_decision_tree = decision_tree_learning(training_set, example_numbers_set, attribute_set, None, information_gain)
-
+    good_decision_tree = decision_tree_learning(training_set, training_numbers_set, attribute_set, None, information_gain)
+    bad_decision_tree = decision_tree_learning(training_set, training_numbers_set, attribute_set, None, random_importance)
     test_examples = read_examples("data/test.txt")
-    training_numbers_set = set([i for i in range(len(test_examples))])
+    # test_numbers_set = set([i for i in range(len(test_examples))])
 
+    classifications = []
 
+    for example in test_examples:
+        temp = [example[-1]]
+        temp.append(classify(bad_decision_tree, example))
+        temp.append(classify(bad_decision_tree, example))
+
+    for i in range(len(classifications)):
+        print(str(i) + ". Real: " + classifications[i][0] + ", Good: " + classifications[i][1] + ", Bad: " + classifications[i][2])
