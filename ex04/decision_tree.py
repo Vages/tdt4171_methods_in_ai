@@ -101,6 +101,7 @@ def decision_tree_learning(examples, example_numbers, attribute_set, parent_exam
     if len(attribute_set) == 0:
         return plurality_value(examples, example_numbers)
 
+    #Find argmax
     max_importance = -1
     for a in attribute_set:
         a_importance = importance(examples, example_numbers, a)
@@ -113,7 +114,10 @@ def decision_tree_learning(examples, example_numbers, attribute_set, parent_exam
 
     tree = {"root_test": argmax}
 
-    #We need some recursive loop here.
+    new_attribute_set = attribute_set.difference([argmax])
+
+    for v in vals:
+        tree[v] = decision_tree_learning(examples, vals[v], new_attribute_set, example_numbers, importance)
 
     return tree
 
