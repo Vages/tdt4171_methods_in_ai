@@ -45,12 +45,12 @@ def boolean_entropy(q):
     try:
         return -(q*math.log2(q)+(1-q)*math.log2(1-q))
     except ValueError:  # Happens if q is 1 or 0, which causes a problem with the logarithm function.
-        return 0        # 0 is a safe choice here due to the nature of the problem.
+        return 0
 
 
 def find_true_count(examples, example_numbers):
     """
-    Finds the number of true results in the subset.
+    Finds the number of specimen in the subset whose classification is True.
     True is assumed to be the largest of the result values.
 
     :param examples: The entire set of examples.
@@ -105,7 +105,7 @@ def random_importance(examples, example_numbers, a):
 
 def information_gain(examples, example_numbers, a):
     """
-    Finds the information gain of splitting the subset using attribute a.
+    Finds the information gain from splitting the subset using attribute a.
 
     :param examples: The entire set of examples.
     :param example_numbers: The subset in question.
@@ -137,9 +137,9 @@ def find_values_and_example_numbers(examples, example_numbers, attribute):
         if val not in values:
             values[val] = set()
     
-    for e in example_numbers: # For every example number in question
+    for e in example_numbers:  # For every example number in question
         v = examples[e][attribute]
-        values[v].add(e)        # Add example number e to the set of training_set
+        values[v].add(e)  # Add example number e to the set of examples
 
     return values
 
@@ -261,7 +261,7 @@ def test_for_accuracy(decision_tree, test_set):
 
 def build_graph(graph, node, address=""):
     """Builds a graph of the decision tree in the dot language recursively.
-    This depends on the pydot library (pydot3k, to be exact), which again depends on GraphViz.
+    This depends on the pydot library (pydot3k), which again depends on GraphViz.
 
     :param graph: The graph we are working with. Must be declared from the outside.
     :param node: The node being examined (a dictionary).
