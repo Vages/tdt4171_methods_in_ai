@@ -45,9 +45,6 @@ def find_true_count(examples, example_numbers):
     :return: The proportion of true variables.
     """
 
-    # The value for "True" is expected to be the highest of the result values.
-    # This function should never be run if there is only one kind of value in the results.
-
     true_value = max(examples, key=lambda x: x[-1])[-1]
 
     true_count = 0
