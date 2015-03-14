@@ -149,34 +149,34 @@ def decision_tree_learning(examples, example_numbers, attribute_set, parent_exam
     random_index = random.sample(example_numbers, 1)[0]
     random_result = examples[random_index][-1]
 
-    for e in example_numbers:
+    for e in example_numbers:  # Check if all examples have same classification
         if examples[e][-1] != random_result:
             break
     else:
-        # If previous loop executed without breaks, all have same classification
-        # Thus, return this classification
         return random_result
 
-    if len(attribute_set) == 0:
+    if len(attribute_set) == 0:  # Attribute set is empty
         return plurality_value(examples, example_numbers)
 
-    #Find argmax
+    # Find argmax
     max_importance = -1
+
     for a in attribute_set:
         a_importance = importance(examples, example_numbers, a)
         if a_importance > max_importance:
             max_importance = a_importance
             argmax = a
 
-    #Find values of argmax-attribute and the examples that take on those values
-    vals = find_values_and_example_numbers(examples, example_numbers, argmax)
-
+    # Construct a new tree to be returned
     tree = {"root_test": argmax}
+
+    # Find values of argmax-attribute and the examples that take on those values
+    values = find_values_and_example_numbers(examples, example_numbers, argmax)
 
     new_attribute_set = attribute_set.difference([argmax])
 
-    for v in vals:
-        tree[v] = decision_tree_learning(examples, vals[v], new_attribute_set, example_numbers, importance)
+    for v in values:
+        tree[v] = decision_tree_learning(examples, values[v], new_attribute_set, example_numbers, importance)
 
     return tree
 
