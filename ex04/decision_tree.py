@@ -42,6 +42,18 @@ def find_true_proportion(examples, example_numbers):
             true_count += 1
 
     return true_count/len(example_numbers)
+
+
+
+def random_importance(examples, example_numbers, a):
+    """A sheep function in wolf's clothing: Returns a random number.
+
+    :param examples:
+    :param example_numbers:
+    :param a:
+    :return:
+    """
+    return random.random()
     """Returns a decision tree.
 
     Builds on fig. 18.5 from Artificial Intelligence: A modern approach.
