@@ -260,22 +260,23 @@ if __name__ == "__main__":
     number_of_attributes = len(training_set[0])-1
     attribute_set = set([i for i in range(number_of_attributes)])
 
-    good_decision_tree = decision_tree_learning(training_set, training_numbers_set, attribute_set, None, information_gain)
-    bad_decision_tree = decision_tree_learning(training_set, training_numbers_set, attribute_set, None, random_importance)
     test_examples = read_examples("data/test.txt")
-    # test_numbers_set = set([i for i in range(len(test_examples))])
 
-    classifications = []
+    number_of_runs = 10
 
-    for example in test_examples:
-        temp = [example[-1]]
-        temp.append(classify(good_decision_tree, example))
-        temp.append(classify(bad_decision_tree, example))
-        classifications.append(temp)
+    good_accuracies = []
+    bad_accuracies = []
 
-    for i in range(len(classifications)):
-        print(str(i) + ". Real: " + classifications[i][0] + ", Good: " + classifications[i][1] + ", Bad: " + classifications[i][2])
-        #if classifications[i][0] != classifications[i][1]:
-        #    print("Good wrong")
-        if classifications[i][0] != classifications[i][2]:
-            print("Bad wrong")
+    for i in range(number_of_runs):
+        good_decision_tree = decision_tree_learning(training_set, training_numbers_set, attribute_set, None, information_gain)
+        bad_decision_tree = decision_tree_learning(training_set, training_numbers_set, attribute_set, None, random_importance)
+        good_accuracies.append(test_for_accuracy(good_decision_tree, test_examples))
+        bad_accuracies.append(test_for_accuracy(bad_decision_tree, test_examples))
+
+    print("Good accuracies and erroneous indices")
+    for item in good_accuracies:
+        print(item)
+
+    print("Bad accuracies and erroneous indices")
+    for item in bad_accuracies:
+        print(item)
