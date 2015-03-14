@@ -11,6 +11,7 @@ def plurality_value(examples, example_numbers):
     :param example_numbers: The examples to be examined.
     :return: The most common result.
     """
+
     counts = {}
 
     for i in example_numbers:
