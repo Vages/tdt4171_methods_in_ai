@@ -226,7 +226,7 @@ def classify(decision_tree, example):
         return decision_tree
 
     test_attribute = decision_tree["root_test"]
-    classify(decision_tree[example[test_attribute]], example)
+    return classify(decision_tree[example[test_attribute]], example)
 
 if __name__ == "__main__":
     training_set = read_examples("data/training.txt")
