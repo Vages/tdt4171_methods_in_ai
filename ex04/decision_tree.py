@@ -1,6 +1,7 @@
 __author__ = 'eirikvageskar'
 import random
 import math
+import pydot
 
 """
 This file solves Exercise 4 given in Artificial Intelligence Methods (TDT4171) at NTNU in march 2015.
@@ -257,6 +258,45 @@ def test_for_accuracy(decision_tree, test_set):
 
     return len(erroneous_indices)/len(test_set), erroneous_indices
 
+
+"""
+The following two functions are reused from the web and are used for drawing a tree of the dict.
+Source: http://stackoverflow.com/questions/13688410/dictionary-object-to-decision-tree-in-pydot
+"""
+menu = {'dinner':
+            {'chicken':'good',
+             'beef':'average',
+             'vegetarian':{
+                   'tofu':'good',
+                   'salad':{
+                            'caeser':'bad',
+                            'italian':'average'}
+                   },
+             'pork':'bad'}
+        }
+
+
+def draw(parent_name, child_name, text=""):
+    edge = pydot.Edge(parent_name, child_name, label=label)
+    graph.add_edge(edge)
+
+
+def visit(node, parent=None):
+    for k in node:
+        v = node[k]
+        if isinstance(v, dict):
+            # We start with the root node whose parent is None
+            # we don't want to graph the None node
+            if parent:
+                draw(parent, k)
+            visit(v, k)
+        else:
+            draw(parent, k)
+            # drawing the label using a distinct name
+            draw(k, str(k)+'_'+str(v))
+
+
+
 if __name__ == "__main__":
     training_set = read_examples("data/training.txt")
     training_numbers_set = set([i for i in range(len(training_set))])
@@ -284,3 +324,7 @@ if __name__ == "__main__":
     print("Bad accuracies and erroneous indices")
     for item in bad_accuracies:
         print(item)
+
+    graph = pydot.Dot(graph_type='digraph')
+    visit(menu)
+    graph.write('example1_graph.eps', format="eps")
