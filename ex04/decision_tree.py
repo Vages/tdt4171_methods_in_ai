@@ -14,7 +14,7 @@ The file is made for Python3.
 
 def plurality_value(examples, example_numbers):
     """
-    Finds the most common output value (i.e. last value) among a set of examples.
+    Finds the most common classification (i.e. value at last index) among a set of examples.
 
     :param examples: The complete set of examples.
     :param example_numbers: The examples to be examined.
@@ -43,7 +43,7 @@ def boolean_entropy(q):
 
     try:
         return -(q*math.log2(q)+(1-q)*math.log2(1-q))
-    except ValueError:  # Happens if Q is 1 or 0, which causes a problem with the logarithm.
+    except ValueError:  # Happens if q is 1 or 0, which causes a problem with the logarithm function.
         return 0        # 0 is a safe choice here due to the nature of the problem.
 
 
@@ -94,10 +94,10 @@ def random_importance(examples, example_numbers, a):
     """
     A sheep function in wolf's clothing: Returns a random number.
 
-    :param examples:
-    :param example_numbers:
-    :param a:
-    :return:
+    :param examples: Argument added to make it replaceable with information_gain.
+    :param example_numbers: Argument added to make it replaceable with information_gain.
+    :param a: Argument added to make it replaceable with information_gain.
+    :return: A random number between 0 and 1.
     """
     return random.random()
 
@@ -122,12 +122,12 @@ def information_gain(examples, example_numbers, a):
 
 def find_values_and_example_numbers(examples, example_numbers, attribute):
     """
-    Finds the possible values of attribute a in subset of examples given by example numbers
+    Finds the possible values of attribute a in subset of examples given by example numbers.
 
-    :param examples: The examples
-    :param example_numbers: Example indices
-    :param attribute: The attribute to be examined
-    :return: A dictionary containing attributes and sets of examples
+    :param examples: The entire set of examples.
+    :param example_numbers: The subset in question.
+    :param attribute: The attribute to be examined.
+    :return: A dictionary containing attributes and sets of examples.
     """
     values = {}
 
@@ -136,19 +136,19 @@ def find_values_and_example_numbers(examples, example_numbers, attribute):
         if val not in values:
             values[val] = set()
     
-    for e in example_numbers:       # For every example number in questien
+    for e in example_numbers: # For every example number in question
         v = examples[e][attribute]
-        values[v].add(e)        # Add example number e to the set of training_set.
+        values[v].add(e)        # Add example number e to the set of training_set
 
     return values
 
 
 def have_same_classification(examples, example_numbers):
     """
-    Helper method that checks if all examples in the subset have the same classification
+    Helper method that checks if all examples in the subset have the same classification.
 
-    :param examples:
-    :param example_numbers:
+    :param examples: The entire set of examples.
+    :param example_numbers: The subset in question.
     :return:
     """
     random_index = random.sample(example_numbers, 1)[0]
@@ -158,7 +158,7 @@ def have_same_classification(examples, example_numbers):
         if examples[e][-1] != random_result:
             return False
 
-    return random_result
+    return random_result  # No longer as random; we now know that all examples in subset share the value
 
 
 def decision_tree_learning(examples, example_numbers, attribute_set, parent_example_numbers, importance):
@@ -171,21 +171,20 @@ def decision_tree_learning(examples, example_numbers, attribute_set, parent_exam
     :param attribute_set: The set of attributes still to be decided on.
     :param parent_example_numbers: The example_numbers of this branch's parent.
     :param importance: Function used to judge importance of an attribute.
-    :return:
+    :return: The decision tree.
     """
 
-    if len(example_numbers) == 0:  # Examples is empty
+    if len(example_numbers) == 0:  # Example subset is empty
         return plurality_value(examples, parent_example_numbers)
 
     same_classification_check = have_same_classification(examples, example_numbers)
-    if same_classification_check:
+    if same_classification_check:  # All examples have the same classification
         return same_classification_check
 
     if len(attribute_set) == 0:  # Attribute set is empty
         return plurality_value(examples, example_numbers)
 
-    # Find argmax
-    max_importance = -1
+    max_importance = -1  # Dummy importance value
 
     for a in attribute_set:
         a_importance = importance(examples, example_numbers, a)
@@ -201,7 +200,7 @@ def decision_tree_learning(examples, example_numbers, attribute_set, parent_exam
 
     new_attribute_set = attribute_set.difference([argmax])
 
-    for v in values:
+    for v in values:  # Construct subtrees for every possible value argmax can take on
         tree[v] = decision_tree_learning(examples, values[v], new_attribute_set, example_numbers, importance)
 
     return tree
