@@ -133,7 +133,6 @@ def find_values_and_example_numbers(examples, example_numbers, attribute):
 def decision_tree_learning(examples, example_numbers, attribute_set, parent_example_numbers, importance):
     """
     Returns a decision tree.
-
     Builds on fig. 18.5 from Artificial Intelligence: A modern approach.
 
     :param examples: The complete set of examples to work on.
@@ -143,7 +142,8 @@ def decision_tree_learning(examples, example_numbers, attribute_set, parent_exam
     :param importance: Function used to judge importance of an attribute.
     :return:
     """
-    if len(example_numbers) == 0:
+
+    if len(example_numbers) == 0:  # Examples is empty
         return plurality_value(examples, parent_example_numbers)
 
     random_index = random.sample(example_numbers, 1)[0]
@@ -181,14 +181,14 @@ def decision_tree_learning(examples, example_numbers, attribute_set, parent_exam
     return tree
 
 
-def read_examples(filepath):
+def read_examples(file_path):
     """
     Read examples from a file and put them in a list.
 
-    :param filepath: Filepath or filename.
+    :param file_path: Filepath or filename.
     :return: Example list
     """
-    f = open(filepath)
+    f = open(file_path)
     examples = []
     for line in f:
         examples.append(line.split())
