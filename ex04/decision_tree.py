@@ -103,7 +103,7 @@ def decision_tree_learning(examples, example_numbers, attribute_set, parent_exam
 
     max_importance = -1
     for a in attribute_set:
-        a_importance = importance(a, example_numbers)
+        a_importance = importance(examples, example_numbers, a)
         if a_importance > max_importance:
             max_importance = a_importance
             argmax = a
