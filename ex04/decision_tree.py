@@ -32,6 +32,7 @@ def boolean_entropy(q):
     :return: Boolean entropy
     """
 
+    #Todo: If conversion to Python3, replace log with log2 function.
     return -(q*math.log(q, 2)+(1-q)*log((1-q), 2))
 
 
@@ -76,7 +77,6 @@ def remainder(examples, example_numbers, a):
         remainder_sum += (pk_plus_nk/p_plus_n)*boolean_entropy_of_k_set
 
     return remainder_sum
-
 
 
 def random_importance(examples, example_numbers, a):
