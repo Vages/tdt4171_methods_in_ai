@@ -22,7 +22,6 @@ def plurality_value(examples, example_numbers):
     return max(counts, key=lambda x: counts[x])
 
 
-def decision_tree_learning(examples, example_numbers, attribute_set, parent_example_numbers):
 def boolean_entropy(q):
     """Boolean entropy for a variable with probability q of being true
 
@@ -84,6 +83,9 @@ def find_values_and_example_numbers(examples, example_numbers, attribute):
             values[v] = {e}         # If set doesn't exist, make a new one.
 
     return values
+
+
+def decision_tree_learning(examples, example_numbers, attribute_set, parent_example_numbers, importance):
     """Returns a decision tree.
 
     Builds on fig. 18.5 from Artificial Intelligence: A modern approach.
