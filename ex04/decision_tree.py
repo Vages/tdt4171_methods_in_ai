@@ -3,7 +3,12 @@ import random
 import math
 
 """
-Made for Python3
+This file solves Exercise 4 given in Artificial Intelligence Methods (TDT4171) at NTNU in march 2015.
+The task is implementing a Decision Tree Learning algorithm given in Artificial Intelligence, a Modern Approach.
+
+This is realized with the decision_tree_learning algorithm at its core, as well as a few helper methods.
+
+The file is made for Python3.
 """
 
 
