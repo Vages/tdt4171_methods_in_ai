@@ -98,6 +98,18 @@ def decision_tree_learning(examples, example_numbers, attribute_set, parent_exam
     """
     if len(example_numbers) == 0:
         return plurality_value(examples, parent_example_numbers)
+
+    random_index = random.sample(example_numbers, 1)[0]
+    random_result = examples[random_index][-1]
+
+    for e in example_numbers:
+        if examples[e][-1] != random_result:
+            break
+    else:
+        # If previous loop executed without breaks, all have same classification
+        # Thus, return this classification
+        return random_result
+
     if len(attribute_set) == 0:
         return plurality_value(examples, example_numbers)
 
