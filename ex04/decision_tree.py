@@ -251,10 +251,7 @@ def test_for_accuracy(decision_tree, test_set):
         if x != y:
             erroneous_indices.append(i)
 
-    if erroneous_indices:
-        print(erroneous_indices)
-
-    return len(erroneous_indices)/len(test_set)
+    return len(erroneous_indices)/len(test_set), erroneous_indices
 
 if __name__ == "__main__":
     training_set = read_examples("data/training.txt")
