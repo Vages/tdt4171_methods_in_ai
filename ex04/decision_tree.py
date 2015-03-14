@@ -232,6 +232,30 @@ def classify(decision_tree, example):
     test_attribute = decision_tree["root_test"]
     return classify(decision_tree[example[test_attribute]], example)
 
+
+def test_for_accuracy(decision_tree, test_set):
+    """Tests the accuracy for the given decision tree on the given test set.
+
+    :param decision_tree:
+    :param test_set:
+    :return:
+    """
+
+    results = []
+    for item in test_set:
+        results.append((item[-1], classify(decision_tree, item)))
+
+    erroneous_indices = []
+    for i in range(len(results)):
+        x, y = results[i][0], results[i][1]
+        if x != y:
+            erroneous_indices.append(i)
+
+    if erroneous_indices:
+        print(erroneous_indices)
+
+    return len(erroneous_indices)/len(test_set)
+
 if __name__ == "__main__":
     training_set = read_examples("data/training.txt")
     training_numbers_set = set([i for i in range(len(training_set))])
