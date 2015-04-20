@@ -44,7 +44,7 @@ def load_data(file_path):
     return data_set
 
 
-# EIRIK: Perhaps simply remove this class and work directly on the data
+# Eirik: Perhaps simply remove this class and work directly on the data
 class DataHolder:
     """
     A class that holds all the data in one of our sets (the training set or the test set)
