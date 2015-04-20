@@ -2,6 +2,7 @@ import math
 import random
 import copy
 
+
 def log_func(x):
     """
     The transfer function of neurons, g(x)
