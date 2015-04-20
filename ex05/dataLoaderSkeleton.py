@@ -26,8 +26,7 @@ def load_data(file_path):
     """
     data = open(file_path)
     data_set = {}
-    for line in data:
-        # Extracting all the useful info from the line of data
+    for line in data:  # Extracting all the useful info from the line of data
         line_data = line.split()
         rating = int(line_data[0])
         qid = int(line_data[1].split(':')[1])
@@ -36,8 +35,8 @@ def load_data(file_path):
             if '#docid' in elem:  # We reached a comment. Line done.
                 break
             features.append(float(elem.split(':')[1]))
-        # Creating a new data instance, inserting in the dict.
-        di = DataInstance(qid, rating, features)
+
+        di = DataInstance(qid, rating, features)  # Creating a new data instance, inserting in the dict.
         if qid in data_set.keys():
             data_set[qid].append(di)
         else:
@@ -45,6 +44,7 @@ def load_data(file_path):
     return data_set
 
 
+# EIRIK: Perhaps simply remove this class and work directly on the data
 class DataHolder:
     """
     A class that holds all the data in one of our sets (the training set or the test set)
@@ -55,12 +55,13 @@ class DataHolder:
 
 def run_rank(training_set, test_set):
     # TODO: Insert the code for training and testing your ranker here.
-    # Data holders for training and test set
-    dh_training = DataHolder(training_set)
-    dh_testing = DataHolder(test_set)
 
-    # Creating an ANN instance - feel free to experiment with the learning rate (the third parameter).
-    nn = bp.NN(46, 10, 0.001)
+    # Data holders for training and test set
+    data_set_training = load_data(training_set)
+    data_set_testing = load_data(test_set)
+
+    nn = bp.NN(46, 10, 0.001)  # Creating an ANN instance
+    # TODO: Feel free to experiment with the learning rate (the third parameter).
 
     # TODO: The lists below should hold training patterns in this format:
     # [(data1Features,data2Features), (data1Features,data3Features), ... , (dataNFeatures,dataMFeatures)]
@@ -68,17 +69,17 @@ def run_rank(training_set, test_set):
     training_patterns = []  # For holding all the training patterns we will feed the network
     test_patterns = []  # For holding all the test patterns we will feed the network
 
-    for qid in dh_training.data_set.keys():
+    for qid in data_set_training.keys():
         # This iterates through every query ID in our training set
-        data_instance=dh_training.data_set[qid]  # All data instances (query, features, rating) for query qid
+        data_instance = data_set_training[qid]  # All data instances (query, features, rating) for query qid
         # TODO: Store the training instances into the training_patterns array.
         # Remember to store them as pairs, where the first item is rated higher than the second.
         # TODO: Hint: A good first step to get the pair ordering right, is to sort the instances
         # based on their rating for this query. (sort by x.rating for each x in DataInstance)
 
-    for qid in dh_testing.data_set.keys():
+    for qid in data_set_testing.keys():
         # This iterates through every query ID in our test set
-        data_instance = dh_testing.data_set[qid]
+        data_instance = data_set_testing[qid]
         # TODO: Store the test instances into the test_patterns array, once again as pairs.
         # TODO: Hint: The testing will be easier for you if you also now order the pairs -
         # it will make it easy to see if the ANN agrees with your ordering.
@@ -92,6 +93,7 @@ def run_rank(training_set, test_set):
         # Check ANN performance after training.
         nn.count_misordered_pairs(test_patterns)
 
-    # TODO: Store the data returned by count_misordered_pairs and plot it, showing how training and testing errors develop.
+    # TODO: Store the data returned by count_misordered_pairs and plot it,
+    # showing how training and testing errors develop.
 
 run_rank("train.txt", "test.txt")
