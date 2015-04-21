@@ -1,16 +1,18 @@
 __author__ = 'kaiolae'
 import backprop_skeleton as bp
+import time
+import matplotlib.pyplot as plt
 
 
-class DataInstance:
+class QueryInstance:
     """
-    Class for holding your data - one object for each line in the data set
+    Holds a query, its rating, and its features
     """
 
     def __init__(self, qid, rating, features):
-        self.qid = qid  # ID of the query
-        self.rating = rating  # Rating of this site for this query
-        self.features = features  # The features of this query-site pair.
+        self.qid = qid
+        self.rating = rating
+        self.features = features
 
     def __str__(self):
         return "Data instance - qid: " + str(self.qid) + ". rating: " + str(self.rating) \
@@ -18,116 +20,182 @@ class DataInstance:
 
 
 def load_data(file_path):
-    """Loads data from a file and returns it as a dict mapping each query ID to a list of relevant documents.
+    """Loads queries from a file and returns a dict mapping each query ID to a list of relevant QueryInstances.
 
     :param file_path: A file with the data.
-    :return: A dict mapping each query ID to the relevant documents, like this: data_set[queryID] = [dataInstance1, ...]
+    :return: A dict mapping query IDs to relevant QueryInstances: query_dict[queryID] = [query_instance1, ...]
     """
 
-    data = open(file_path)
-    data_set = {}
-    for line in data:  # Extracting all the useful info from the line of data
-        line_data = line.split()
-        rating = int(line_data[0])
-        qid = int(line_data[1].split(':')[1])
-        features = []
-        for elem in line_data[2:]:
-            if '#docid' in elem:  # We reached a comment. Line done.
+    queries_file = open(file_path)
+    query_dict = {}
+    for line in queries_file:
+        # Fields of query given by position
+        instance_data = line.split()
+        instance_rating = int(instance_data[0])
+        qid = int(instance_data[1].split(':')[1])
+        instance_features = []
+        for elem in instance_data[2:]:
+            if '#docid' in elem:  # Reached a comment. Line done.
                 break
-            features.append(float(elem.split(':')[1]))
+            instance_features.append(float(elem.split(':')[1]))
 
-        di = DataInstance(qid, rating, features)  # Creating a new data instance, inserting in the dict.
-        if qid in data_set:
-            data_set[qid].append(di)
+        q_inst = QueryInstance(qid, instance_rating, instance_features)  # Creating a new query instance, inserting in the dict.
+        if qid in query_dict:
+            query_dict[qid].append(q_inst)
         else:
-            data_set[qid] = [di]
+            query_dict[qid] = [q_inst]
 
-    return data_set
+    return query_dict
 
 
-# Eirik: Perhaps simply remove this class and work directly on the data
-class DataHolder:
+def generate_sorted_data_set_tuples(query_dict):
+    """Finds all possible QueryInstance pairs for all queries in a query dictionary. The pairs must be for the same
+    query ID, and the first must have a higher rating than the second. It strips the pairs of anything but their
+    features.
+
+    :param query_dict: A dictionary mapping query_id to a  list of relevant QueryInstances
+    :return: All possible feature pairs given the query
     """
-    A class that holds all the data in one of our sets (the training set or the test set)
-    """
-    def __init__(self, data_set):
-        self.data_set = load_data(data_set)
+    results = list()
 
-
-def generate_sorted_data_set_tuples(data_set):
-    """
-
-    :param data_set: A dictionary mapping (query_id, list(DataInstance))
-    :return: All tuples of rankings possible from each query
-    """
-    results = []
-
-    for qid in data_set:
+    for query_id in query_dict:
         # This iterates through every query ID in our training set
-        data_instance = data_set[qid]  # All data instances (query, features, rating) for query qid
+        query_instances = query_dict[query_id]  # All data instances (query, features, rating) for query query_id
 
         # Split the examples by rating
-        data_split_by_rating = {}
-        for item in data_instance:
-            key = item.rating
-            if key in data_split_by_rating:
-                data_split_by_rating[key].append(item)
+        instances_split_by_rating = dict()
+        for instance in query_instances:
+            key = instance.rating
+            if key in instances_split_by_rating:
+                instances_split_by_rating[key].append(instance)
             else:
-                data_split_by_rating[key] = [item]
+                instances_split_by_rating[key] = [instance]
 
-        rating_values = sorted(data_split_by_rating.keys(), reverse=True)  # Sort possible values in descending order
+        rating_values = sorted(instances_split_by_rating.keys(), reverse=True)  # Sort rating values in descending order
 
-        # For each item of each key in each set, generate the
         for i in range(len(rating_values)-1):
             for j in range(i+1, len(rating_values)):
-                for higher_ranked_item in data_split_by_rating[rating_values[i]]:
-                    for lower_ranked_item in data_split_by_rating[rating_values[j]]:
-                        a = str(higher_ranked_item)
-                        b = str(lower_ranked_item)
-                        results.append((higher_ranked_item, lower_ranked_item))
+                for higher_ranked_item in instances_split_by_rating[rating_values[i]]:
+                    for lower_ranked_item in instances_split_by_rating[rating_values[j]]:
+                        results.append((higher_ranked_item.features, lower_ranked_item.features))
 
     return results
 
-def run_rank(training_set, test_set, learning_rate=0.001, iterations=25):
+def average_lists(list_of_lists, invert=False):
+    """Finds the average value of the elements at each list index in a list.
+
+    :param args: A variable number of lists. All must have equal length
+    :return: A list of the averages
+    """
+
+    print(list_of_lists)
+    averages = list()
+    no_of_elements = len(list_of_lists)
+
+    for i in range(len(list_of_lists[0])):
+        results_sum = 0
+        for item in list_of_lists:
+            print(item[i])
+            results_sum += item[i]
+
+        if invert:
+            results_sum = no_of_elements-results_sum
+        averages.append(results_sum/no_of_elements)
+
+    return averages
+
+
+def plot_errors(*args):
+    x_axis = [i for i in range(len(args[0]))]
+    plt.plot(x_axis, args[0], "b", x_axis, args[1], "r--")
+    plt.ylim([0, 1])
+
+    plt.title('Error ratios by epoch')
+    plt.xlabel('Epoch')
+    plt.ylabel('Ratio')
+
+    plt.show()
+
+def run_rank(training_set, test_set, learning_rate=0.001, epochs=25):
     """
 
     :param training_set: File path to training set.
     :param test_set: File path to test set.
     :param learning_rate: Learning rate of the neural network.
-    :param iterations:
+    :param epochs:
     :return:
     """
 
-    # TODO: Insert the code for training and testing your ranker here.
-
     # Make data sets for training and testing. Sort results for each query ID by rating. (Descending rating.)
     data_set_training = load_data(training_set)
-    #data_set_testing = load_data(test_set)
+    data_set_testing = load_data(test_set)
 
     nn = bp.NN(46, 10, learning_rate)  # Create an ANN instance
-    # TODO: Feel free to experiment with the learning rate (the third parameter).
 
     # The lists below should hold training patterns in this format:
     # [(data1Features, data2Features), (data1Features, data3Features), ... , (dataNFeatures, dataMFeatures)]
     # The training set needs to have pairs ordered so the first item of the pair has a higher rating.
 
     training_patterns = generate_sorted_data_set_tuples(data_set_training)
-    #test_patterns = generate_sorted_data_set_tuples(data_set_testing)
-
+    testing_patterns = generate_sorted_data_set_tuples(data_set_testing)
 
     # Check ANN performance before training
-    nn.count_misordered_pairs(test_patterns)
-    for i in range(iterations):
-        # Running 25 iterations, measuring testing performance after each round of training.
+    print("\nTraining neural network")
+    print("\n\tLearning rate:", learning_rate)
+    print("\tIterations:", epochs)
+    print("\n\tTraining set size:", len(training_patterns))
+    print("\tTest set size:", len(testing_patterns))
+    a = time.time()
+
+    performance_on_testing_patterns_before_training = nn.count_misordered_pairs(testing_patterns)
+    print("\nPerformance on test set before training:", performance_on_testing_patterns_before_training)
+    training_errors = [nn.count_misordered_pairs(training_patterns)]
+    testing_errors = [performance_on_testing_patterns_before_training]
+    for i in range(epochs):
+        # Running 25 epochs, measuring testing performance after each round of training.
         # Training
-        nn.train(training_patterns, iterations=1)
+        training_errors.append(nn.train(training_patterns, iterations=1)[0])
         # Check ANN performance after training.
-        nn.count_misordered_pairs(test_patterns)
+        testing_errors.append(nn.count_misordered_pairs(testing_patterns))
+        j = i
+        print('\nTraining error epoch %d:' % (j+1), training_errors[j])
+        print('Testing error epoch %d:' % (j+1), testing_errors[j])
 
-    # TODO: Store the data returned by count_misordered_pairs and plot it,
-    # showing how training and testing errors develop.
+    b = time.time()
 
+    print('\nFinished training and testing in %.2f minutes.' % ((b-a)/60))
+
+    return training_errors, testing_errors
+
+
+def average_run_rank(training_set, test_set, learning_rate=0.001, epochs=25, runs=5):
+    """
+    Does a few runs of the run_rank algorithm and averages the results
+
+    :param training_set:
+    :param test_set:
+    :param learning_rate:
+    :param epochs:
+    :param runs:
+    :return:
+    """
+
+    training_error_rates = list()
+    testing_error_rates = list()
+
+    for i in range(runs):
+        print("\nRun %d of %d" % (i+1, runs))
+        x, y = run_rank(training_set, test_set, learning_rate, epochs)
+        training_error_rates.append(x)
+        testing_error_rates.append(y)
+
+    average_training_error_rates = average_lists(training_error_rates, invert=True)
+    average_testing_error_rates = average_lists(testing_error_rates, invert=True)
+
+    plot_errors(average_training_error_rates, average_testing_error_rates)
 
 if __name__ == '__main__':
-    pass
-    run_rank("data_sets/train.txt", "data_sets/test.txt")
+    print("Running")
+
+    #plot_errors([0.5, 0.75, 0.3]*5, [0.2, 0.8, 0.6]*5)
+    average_run_rank("data_sets/train.txt", "data_sets/test.txt", learning_rate=0.001, epochs=10, runs=1)

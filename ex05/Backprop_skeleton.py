@@ -10,7 +10,7 @@ def log_func(x):
     :param x:
     :return:
     """
-    return 1.0/(1.0+math.exp(-x))
+    return 1.0 / (1.0 + math.exp(-x))
 
 
 def log_func_derivative(x):
@@ -20,7 +20,7 @@ def log_func_derivative(x):
     :param x:
     :return:
     """
-    return math.exp(-x)/(pow(math.exp(-x)+1, 2))
+    return math.exp(-x) / (pow(math.exp(-x) + 1, 2))
 
 
 def random_float(low, high):
@@ -31,7 +31,7 @@ def random_float(low, high):
     :param high: Upper limit
     :return: A random float
     """
-    return random.random()*(high-low) + low
+    return random.random() * (high - low) + low
 
 
 def make_matrix(i, j):
@@ -45,7 +45,7 @@ def make_matrix(i, j):
     m = []
 
     for u in range(i):
-        m.append([0]*j)
+        m.append([0] * j)
 
     return m
 
@@ -53,6 +53,8 @@ def make_matrix(i, j):
 class NN:
     """
     Class holding a neural Network
+
+    :
     """
 
     def __init__(self, num_inputs, num_hidden, learning_rate=0.001):
@@ -69,85 +71,117 @@ class NN:
         self.num_hidden = num_hidden
 
         # Current activation levels for nodes (in other words, the nodes' output value)
-        self.input_activation = [1.0] * self.num_inputs
-        self.hidden_activations = [1.0] * self.num_hidden
-        self.output_activation = 1.0  # Assuming a single output.
+        self.out_i_b = [1.0] * self.num_inputs  # Corresponds to out_i_b
+        self.out_h_b = [1.0] * self.num_hidden  # Corresponds to out_h_b
+        self.o_b = 1.0  # Corresponds to o_b
         self.learning_rate = learning_rate
 
-        # create weights
+        # Create weights
         # A matrix with all weights from input layer to hidden layer
-        self.weights_input = make_matrix(self.num_inputs, self.num_hidden)
+        self.w_i_h = make_matrix(self.num_inputs, self.num_hidden)
+
+        for i in range(self.num_inputs):  # Set the matrix to random values
+            for j in range(self.num_hidden):
+                self.w_i_h[i][j] = random_float(-0.5, 0.5)
 
         # A list with all weights from hidden layer to the single output neuron.
-        self.weights_output = [0 for i in range(self.num_hidden)]  # Assuming single output
+        self.w_h_o = [0] * self.num_hidden  # Corresponds to w_h_o
 
-        for i in range(self.num_inputs):  # Set them to random values
-            for j in range(self.num_hidden):
-                self.weights_input[i][j] = random_float(-0.5, 0.5)
-
-        for j in range(self.num_hidden):
-            self.weights_output[j] = random_float(-0.5, 0.5)
+        for j in range(self.num_hidden):  # Set the list to random values
+            self.w_h_o[j] = random_float(-0.5, 0.5)
 
         # Data for the back-propagation step in RankNets.
         # For storing the previous activation levels (output levels) of all neurons
-        self.prev_input_activations = []
-        self.prev_hidden_activations = []
-        self.prev_output_activation = 0
+        self.out_i_a = []  # Corresponds to out_i_a
+        self.out_h_a = []  # Corresponds to out_h_a
+        self.o_a = 0  # Corresponds to o_a
 
         # For storing the previous delta in the output and hidden layer
-        self.prev_delta_output = 0
-        self.prev_delta_hidden = [0 for i in range(self.num_hidden)]
+        self.delta_o_a = 0  # Corresponds to delta_o_a
+        self.delta_h_a = [0] * self.num_hidden  # Corresponds to delta_h_a
 
         # For storing the current delta in the same layers
-        self.delta_output = 0
-        self.delta_hidden = [0 for i in range(self.num_hidden)]
+        self.delta_o_b = 0  # Corresponds to delta_o_b
+        self.delta_h_b = [0] * self.num_hidden  # Corresponds to delta_h_b (list for all nodes)
 
     def propagate(self, inputs):
-        if len(inputs) != self.num_inputs-1:
+        if len(inputs) != self.num_inputs - 1:
             raise ValueError('Wrong number of inputs')
 
-        # input activations
-        self.prev_input_activations = copy.deepcopy(self.input_activation)
+        self.out_i_a = copy.deepcopy(self.out_i_b)  # Save old input activations
 
-        for i in range(self.num_inputs-1):
-            self.input_activation[i] = inputs[i]
+        for i in range(self.num_inputs - 1):  # Replace by new input activations
+            self.out_i_b[i] = inputs[i]
 
-        self.input_activation[-1] = 1  # Set bias node to -1.
+        self.out_i_b[-1] = 1  # Set bias node to -1.
 
-        # hidden activations
-        self.prev_hidden_activations = copy.deepcopy(self.hidden_activations)
+        self.out_h_a = copy.deepcopy(self.out_h_b)  # Save hidden input activations
 
-        for j in range(self.num_hidden):
-            sum = 0.0
+        for j in range(self.num_hidden):  # Calculate new activations for each hidden node
+            hidden_node_sum = 0.0
 
             for i in range(self.num_inputs):
-                # print self.ai[i] ," * " , self.wi[i][j]
-                sum += self.input_activation[i] * self.weights_input[i][j]
+                hidden_node_sum += self.out_i_b[i] * self.w_i_h[i][j]
 
-            self.hidden_activations[j] = log_func(sum)
+            self.out_h_b[j] = log_func(hidden_node_sum)
 
-        # output activations
-        self.prev_output_activation = self.output_activation
+        self.o_a = self.o_b  # Save old output activation
 
-        sum = 0.0
+        output_node_sum = 0.0
 
-        for j in range(self.num_hidden):
-            sum += self.hidden_activations[j] * self.weights_output[j]
+        for j in range(self.num_hidden):  # Calculate output activation
+            output_node_sum += self.out_h_b[j] * self.w_h_o[j]
 
-        self.output_activation = log_func(sum)
+        self.o_b = log_func(output_node_sum)
 
-        return self.output_activation
+        return self.o_b
 
     def compute_output_delta(self):
-        pass
-        # TODO: Implement the delta function for the output layer (see exercise text)
+        """
+        Computes the output delta given on P3 of the exercise. Assumes that two results have been fed into
+        the network, and that the first pair had a higher rating.
+        """
+
+        o_a = self.o_a  # Output level of the highest rated pair
+        o_b = self.o_b  # Output level of the lowest rated pair
+
+        p_ab = 1 / (1 + math.exp(o_b - o_a))
+
+        delta_o_a = log_func_derivative(o_a) * (1 - p_ab)
+        delta_o_b = log_func_derivative(o_b) * (1 - p_ab)
+
+        self.delta_o_a = delta_o_a
+        self.delta_o_b = delta_o_b
 
     def compute_hidden_delta(self):
-        pass
-        # TODO: Implement the delta function for the hidden layer (see exercise text)
+        """
+        Update the deltas for the hidden nodes.
+        """
+        delta_o_a = self.delta_o_a
+        delta_o_b = self.delta_o_b
+
+        for i in range(self.num_hidden):  # update h_a
+            self.delta_h_a[i] = log_func_derivative(self.out_h_a[i]) * \
+                                     self.w_h_o[i] * (delta_o_a - delta_o_b)
+
+        for i in range(self.num_hidden):  # update h_b
+            self.delta_h_b[i] = log_func_derivative(self.out_h_b[i]) * \
+                                self.w_h_o[i] * (delta_o_a - delta_o_b)
 
     def update_weights(self):
+        """
+        Updates the weights for the network.
+        """
+
+        for i in range(self.num_inputs):
+            for j in range(self.num_hidden):
+                self.w_i_h[i][j] += self.learning_rate * (
+                self.delta_h_a[j] * self.out_i_a[i] - self.delta_h_b[j] * self.out_i_b[i])
+
+        for h in range(self.num_hidden):
+            self.w_h_o[h] += self.learning_rate * (self.delta_o_a * self.out_h_a[h] - self.delta_o_b * self.out_h_b[h])
         # TODO: Update the weights of the network using the deltas (see exercise text)
+
         pass
 
     def back_propagate(self):
@@ -163,30 +197,33 @@ class NN:
         print('Input weights:')
 
         for i in range(self.num_inputs):
-            print(self.weights_input[i])
+            print(self.w_i_h[i])
 
         print()
         print('Output weights:')
-        print(self.weights_output)
+        print(self.w_h_o)
 
     def train(self, patterns, iterations=1):
-        # TODO: Train the network on all patterns for a number of iterations.
-        # To measure performance each iteration: Run for 1 iteration, then count misordered pairs.
-        # TODO: Training is done  like this (details in exercise text):
-        # -Propagate A
-        # -Propagate B
-        # -Back-propagate
-        pass
+
+        error_rates = list()
+
+        for i in range(iterations):
+            for a, b in patterns:
+                self.propagate(a)
+                self.propagate(b)
+                self.back_propagate()
+
+            error_rates.append(self.count_misordered_pairs(patterns))
+
+        return error_rates
 
     def count_misordered_pairs(self, patterns):
-        # TODO: Let the network classify all pairs of patterns. The highest output determines the winner.
-        # for each pair, do
-        # Propagate A
-        # Propagate B
-        # if A>B: A wins. If B>A: B wins
-        # if rating(winner) > rating(loser): numRight++
-        # else: numMisses++
-        # end of for
-        # TODO: Calculate the ratio of correct answers:
-        # errorRate = numMisses/(numRight+numMisses)
-        pass
+        errors = 0
+
+        for a, b in patterns:
+            result_a = self.propagate(a)
+            result_b = self.propagate(b)
+            if result_a < result_b:
+                errors += 1
+
+        return errors/len(patterns)
