@@ -1,7 +1,9 @@
 __author__ = 'kaiolae'
-import backprop_skeleton as bp
 import time
+
 import matplotlib.pyplot as plt
+
+import backprop_skeleton as bp
 
 
 class QueryInstance:
@@ -39,7 +41,8 @@ def load_query_dict_from_file(file_path):
                 break
             instance_features.append(float(elem.split(':')[1]))
 
-        q_inst = QueryInstance(qid, instance_rating, instance_features)  # Creating a new query instance, inserting in the dict.
+        q_inst = QueryInstance(qid, instance_rating,
+                               instance_features)  # Creating a new query instance, inserting in the dict.
         if qid in query_dict:
             query_dict[qid].append(q_inst)
         else:
@@ -75,13 +78,14 @@ def generate_sorted_feature_pairs(query_dict):
         rating_values = sorted(instances_split_by_rating.keys(), reverse=True)
 
         # Generate every possible pair
-        for i in range(len(rating_values)-1):
-            for j in range(i+1, len(rating_values)):
+        for i in range(len(rating_values) - 1):
+            for j in range(i + 1, len(rating_values)):
                 for higher_ranked_item in instances_split_by_rating[rating_values[i]]:
                     for lower_ranked_item in instances_split_by_rating[rating_values[j]]:
                         results.append((higher_ranked_item.features, lower_ranked_item.features))
 
     return results
+
 
 def average_lists(list_of_lists, invert=False):
     """Finds the average value of the elements at a given position (given several lists of equal length).
@@ -100,9 +104,9 @@ def average_lists(list_of_lists, invert=False):
             results_sum += item[i]
 
         if invert:
-            results_sum = no_of_lists-results_sum
+            results_sum = no_of_lists - results_sum
 
-        averages.append(results_sum/no_of_lists)
+        averages.append(results_sum / no_of_lists)
 
     return averages
 
@@ -166,12 +170,12 @@ def run_ranknet(training_set, test_set, learning_rate=0.001, epochs=25):
         training_errors.append(nn.train(training_pairs, iterations=1)[0])
         testing_errors.append(nn.count_misordered_pairs(testing_pairs))  # Check ANN performance after training.
 
-        print('\nTraining error epoch %d:' % (i+1), training_errors[i])
-        print('Testing error epoch %d:' % (i+1), testing_errors[i])
+        print('\nTraining error epoch %d:' % (i + 1), training_errors[i])
+        print('Testing error epoch %d:' % (i + 1), testing_errors[i])
 
     b = time.time()
 
-    print('\nFinished training and testing in %.2f minutes.' % ((b-a)/60))
+    print('\nFinished training and testing in %.2f minutes.' % ((b - a) / 60))
 
     return training_errors, testing_errors
 
@@ -192,7 +196,7 @@ def average_run_ranknet(training_set, test_set, learning_rate=0.001, epochs=25, 
     testing_error_rates = list()
 
     for i in range(runs):
-        print("\nRun %d of %d" % (i+1, runs))
+        print("\nRun %d of %d" % (i + 1, runs))
         x, y = run_ranknet(training_set, test_set, learning_rate, epochs)
         training_error_rates.append(x)
         testing_error_rates.append(y)
@@ -202,7 +206,8 @@ def average_run_ranknet(training_set, test_set, learning_rate=0.001, epochs=25, 
 
     plot_errors(average_training_error_rates, average_testing_error_rates)
 
+
 if __name__ == '__main__':
     print("Running")
 
-    average_run_ranknet("data_sets/train.txt", "data_sets/test.txt", learning_rate=0.001, epochs=2, runs=2)
+    average_run_ranknet("data_sets/train.txt", "data_sets/test.txt", learning_rate=0.001, epochs=25, runs=5)

@@ -162,7 +162,7 @@ class NN:
 
         for i in range(self.num_hidden):  # update h_a
             self.delta_h_a[i] = log_func_derivative(self.out_h_a[i]) * \
-                                     self.w_h_o[i] * (delta_o_a - delta_o_b)
+                                self.w_h_o[i] * (delta_o_a - delta_o_b)
 
         for i in range(self.num_hidden):  # update h_b
             self.delta_h_b[i] = log_func_derivative(self.out_h_b[i]) * \
@@ -176,7 +176,7 @@ class NN:
         for i in range(self.num_inputs):
             for j in range(self.num_hidden):
                 self.w_i_h[i][j] += self.learning_rate * (
-                self.delta_h_a[j] * self.out_i_a[i] - self.delta_h_b[j] * self.out_i_b[i])
+                    self.delta_h_a[j] * self.out_i_a[i] - self.delta_h_b[j] * self.out_i_b[i])
 
         for h in range(self.num_hidden):
             self.w_h_o[h] += self.learning_rate * (self.delta_o_a * self.out_h_a[h] - self.delta_o_b * self.out_h_b[h])
@@ -226,4 +226,4 @@ class NN:
             if result_a < result_b:
                 errors += 1
 
-        return errors/len(patterns)
+        return errors / len(patterns)
