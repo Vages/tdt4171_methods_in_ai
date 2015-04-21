@@ -1,5 +1,4 @@
 __author__ = 'kaiolae'
-__author__ = 'kaiolae'
 import backprop_skeleton as bp
 
 
@@ -7,6 +6,7 @@ class DataInstance:
     """
     Class for holding your data - one object for each line in the data set
     """
+
     def __init__(self, qid, rating, features):
         self.qid = qid  # ID of the query
         self.rating = rating  # Rating of this site for this query
@@ -18,12 +18,12 @@ class DataInstance:
 
 
 def load_data(file_path):
-    """Loads data from a file
+    """Loads data from a file and returns it as a dict mapping each query ID to a list of relevant documents.
 
     :param file_path: A file with the data.
-    :return: A dict mapping each query ID to the relevant documents,
-    like this: data_set[queryID] = [dataInstance1, dataInstance2, ...]
+    :return: A dict mapping each query ID to the relevant documents, like this: data_set[queryID] = [dataInstance1, ...]
     """
+
     data = open(file_path)
     data_set = {}
     for line in data:  # Extracting all the useful info from the line of data
@@ -37,10 +37,11 @@ def load_data(file_path):
             features.append(float(elem.split(':')[1]))
 
         di = DataInstance(qid, rating, features)  # Creating a new data instance, inserting in the dict.
-        if qid in data_set.keys():
+        if qid in data_set:
             data_set[qid].append(di)
         else:
             data_set[qid] = [di]
+
     return data_set
 
 
@@ -53,40 +54,70 @@ class DataHolder:
         self.data_set = load_data(data_set)
 
 
-def run_rank(training_set, test_set):
+def generate_sorted_data_set_tuples(data_set):
+    """
+
+    :param data_set: A dictionary mapping (query_id, list(DataInstance))
+    :return: All tuples of rankings possible from each query
+    """
+    results = []
+
+    for qid in data_set:
+        # This iterates through every query ID in our training set
+        data_instance = data_set[qid]  # All data instances (query, features, rating) for query qid
+
+        # Split the examples by rating
+        data_split_by_rating = {}
+        for item in data_instance:
+            key = item.rating
+            if key in data_split_by_rating:
+                data_split_by_rating[key].append(item)
+            else:
+                data_split_by_rating[key] = [item]
+
+        rating_values = sorted(data_split_by_rating.keys(), reverse=True)  # Sort possible values in descending order
+
+        # For each item of each key in each set, generate the
+        for i in range(len(rating_values)-1):
+            for j in range(i+1, len(rating_values)):
+                for higher_ranked_item in data_split_by_rating[rating_values[i]]:
+                    for lower_ranked_item in data_split_by_rating[rating_values[j]]:
+                        a = str(higher_ranked_item)
+                        b = str(lower_ranked_item)
+                        results.append((higher_ranked_item, lower_ranked_item))
+
+    return results
+
+def run_rank(training_set, test_set, learning_rate=0.001, iterations=25):
+    """
+
+    :param training_set: File path to training set.
+    :param test_set: File path to test set.
+    :param learning_rate: Learning rate of the neural network.
+    :param iterations:
+    :return:
+    """
+
     # TODO: Insert the code for training and testing your ranker here.
 
-    # Data holders for training and test set
+    # Make data sets for training and testing. Sort results for each query ID by rating. (Descending rating.)
     data_set_training = load_data(training_set)
-    data_set_testing = load_data(test_set)
+    #data_set_testing = load_data(test_set)
 
-    nn = bp.NN(46, 10, 0.001)  # Creating an ANN instance
+    nn = bp.NN(46, 10, learning_rate)  # Create an ANN instance
     # TODO: Feel free to experiment with the learning rate (the third parameter).
 
-    # TODO: The lists below should hold training patterns in this format:
-    # [(data1Features,data2Features), (data1Features,data3Features), ... , (dataNFeatures,dataMFeatures)]
-    # TODO: The training set needs to have pairs ordered so the first item of the pair has a higher rating.
-    training_patterns = []  # For holding all the training patterns we will feed the network
-    test_patterns = []  # For holding all the test patterns we will feed the network
+    # The lists below should hold training patterns in this format:
+    # [(data1Features, data2Features), (data1Features, data3Features), ... , (dataNFeatures, dataMFeatures)]
+    # The training set needs to have pairs ordered so the first item of the pair has a higher rating.
 
-    for qid in data_set_training.keys():
-        # This iterates through every query ID in our training set
-        data_instance = data_set_training[qid]  # All data instances (query, features, rating) for query qid
-        # TODO: Store the training instances into the training_patterns array.
-        # Remember to store them as pairs, where the first item is rated higher than the second.
-        # TODO: Hint: A good first step to get the pair ordering right, is to sort the instances
-        # based on their rating for this query. (sort by x.rating for each x in DataInstance)
+    training_patterns = generate_sorted_data_set_tuples(data_set_training)
+    #test_patterns = generate_sorted_data_set_tuples(data_set_testing)
 
-    for qid in data_set_testing.keys():
-        # This iterates through every query ID in our test set
-        data_instance = data_set_testing[qid]
-        # TODO: Store the test instances into the test_patterns array, once again as pairs.
-        # TODO: Hint: The testing will be easier for you if you also now order the pairs -
-        # it will make it easy to see if the ANN agrees with your ordering.
 
     # Check ANN performance before training
     nn.count_misordered_pairs(test_patterns)
-    for i in range(25):
+    for i in range(iterations):
         # Running 25 iterations, measuring testing performance after each round of training.
         # Training
         nn.train(training_patterns, iterations=1)
@@ -96,4 +127,7 @@ def run_rank(training_set, test_set):
     # TODO: Store the data returned by count_misordered_pairs and plot it,
     # showing how training and testing errors develop.
 
-run_rank("train.txt", "test.txt")
+
+if __name__ == '__main__':
+    pass
+    run_rank("data_sets/train.txt", "data_sets/test.txt")
