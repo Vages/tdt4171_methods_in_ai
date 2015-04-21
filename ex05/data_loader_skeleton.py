@@ -19,7 +19,7 @@ class QueryInstance:
                + ". features: " + str(self.features)
 
 
-def load_data(file_path):
+def load_query_dict_from_file(file_path):
     """Loads queries from a file and returns a dict mapping each query ID to a list of relevant QueryInstances.
 
     :param file_path: A file with the data.
@@ -48,19 +48,19 @@ def load_data(file_path):
     return query_dict
 
 
-def generate_sorted_data_set_tuples(query_dict):
-    """Finds all possible QueryInstance pairs for all queries in a query dictionary. The pairs must be for the same
-    query ID, and the first must have a higher rating than the second. It strips the pairs of anything but their
-    features.
+def generate_sorted_feature_pairs(query_dict):
+    """Finds all possible QueryInstance pairs for all queries in a query dictionary. It strips the pairs of anything
+    but their features. The pairs will be for the same query ID, and the first will have a higher rating than the
+    second.
 
-    :param query_dict: A dictionary mapping query_id to a  list of relevant QueryInstances
+    :param query_dict: A dictionary mapping query_id to a list of relevant QueryInstances
     :return: All possible feature pairs given the query
     """
     results = list()
 
     for query_id in query_dict:
         # This iterates through every query ID in our training set
-        query_instances = query_dict[query_id]  # All data instances (query, features, rating) for query query_id
+        query_instances = query_dict[query_id]  # All query instances for the query_id
 
         # Split the examples by rating
         instances_split_by_rating = dict()
@@ -71,8 +71,10 @@ def generate_sorted_data_set_tuples(query_dict):
             else:
                 instances_split_by_rating[key] = [instance]
 
-        rating_values = sorted(instances_split_by_rating.keys(), reverse=True)  # Sort rating values in descending order
+        # Find all rating values and sort them in descending orders
+        rating_values = sorted(instances_split_by_rating.keys(), reverse=True)
 
+        # Generate every possible pair
         for i in range(len(rating_values)-1):
             for j in range(i+1, len(rating_values)):
                 for higher_ranked_item in instances_split_by_rating[rating_values[i]]:
@@ -82,33 +84,39 @@ def generate_sorted_data_set_tuples(query_dict):
     return results
 
 def average_lists(list_of_lists, invert=False):
-    """Finds the average value of the elements at each list index in a list.
+    """Finds the average value of the elements at a given position (given several lists of equal length).
 
-    :param args: A variable number of lists. All must have equal length
-    :return: A list of the averages
+    :param args: A variable number of lists. All must have equal length.
+    :param invert: Whether the values should be inverted, i.e. subtracted from 1.
+    :return: A list with the average values.
     """
 
-    print(list_of_lists)
-    averages = list()
-    no_of_elements = len(list_of_lists)
+    averages = list()  # Will contain the averages
+    no_of_lists = len(list_of_lists)  # Length of lists
 
     for i in range(len(list_of_lists[0])):
         results_sum = 0
         for item in list_of_lists:
-            print(item[i])
             results_sum += item[i]
 
         if invert:
-            results_sum = no_of_elements-results_sum
-        averages.append(results_sum/no_of_elements)
+            results_sum = no_of_lists-results_sum
+
+        averages.append(results_sum/no_of_lists)
 
     return averages
 
 
 def plot_errors(*args):
-    x_axis = [i for i in range(len(args[0]))]
+    """Shows two lists of equal length in a plot.
+
+    :param args: The two lists
+    :return:
+    """
+
+    x_axis = [i for i in range(len(args[0]))]  # Generate x-coordinates
     plt.plot(x_axis, args[0], "b", x_axis, args[1], "r--")
-    plt.ylim([0, 1])
+    plt.ylim([0, 1])  # Set y-axis limits
 
     plt.title('Error ratios by epoch')
     plt.xlabel('Epoch')
@@ -116,50 +124,50 @@ def plot_errors(*args):
 
     plt.show()
 
-def run_rank(training_set, test_set, learning_rate=0.001, epochs=25):
+
+def run_ranknet(training_set, test_set, learning_rate=0.001, epochs=25):
+    """Runs the the RankNet algorithm for the given number of epochs and returns a tuple of training set error rates
+    and test set error rates, listed for each epoch.
+
+    :param training_set: File path to training set
+    :param test_set: File path to test set
+    :param learning_rate: Learning rate of the neural network
+    :param epochs: Number of epochs that the set will be run for
+    :return: Training set error rates, test set error rates
     """
 
-    :param training_set: File path to training set.
-    :param test_set: File path to test set.
-    :param learning_rate: Learning rate of the neural network.
-    :param epochs:
-    :return:
-    """
+    query_dict_training = load_query_dict_from_file(training_set)
+    query_dict_testing = load_query_dict_from_file(test_set)
 
-    # Make data sets for training and testing. Sort results for each query ID by rating. (Descending rating.)
-    data_set_training = load_data(training_set)
-    data_set_testing = load_data(test_set)
+    nn = bp.NN(46, 10, learning_rate)  # Create an artificial neural network
 
-    nn = bp.NN(46, 10, learning_rate)  # Create an ANN instance
-
-    # The lists below should hold training patterns in this format:
-    # [(data1Features, data2Features), (data1Features, data3Features), ... , (dataNFeatures, dataMFeatures)]
-    # The training set needs to have pairs ordered so the first item of the pair has a higher rating.
-
-    training_patterns = generate_sorted_data_set_tuples(data_set_training)
-    testing_patterns = generate_sorted_data_set_tuples(data_set_testing)
+    training_pairs = generate_sorted_feature_pairs(query_dict_training)
+    testing_pairs = generate_sorted_feature_pairs(query_dict_testing)
 
     # Check ANN performance before training
     print("\nTraining neural network")
     print("\n\tLearning rate:", learning_rate)
     print("\tIterations:", epochs)
-    print("\n\tTraining set size:", len(training_patterns))
-    print("\tTest set size:", len(testing_patterns))
-    a = time.time()
+    print("\n\tTraining set size:", len(training_pairs))
+    print("\tTest set size:", len(testing_pairs))
 
-    performance_on_testing_patterns_before_training = nn.count_misordered_pairs(testing_patterns)
-    print("\nPerformance on test set before training:", performance_on_testing_patterns_before_training)
-    training_errors = [nn.count_misordered_pairs(training_patterns)]
-    testing_errors = [performance_on_testing_patterns_before_training]
+    a = time.time()  # For measuring time taken
+
+    # Check performance before training
+    performance_on_training_pairs_before_training = nn.count_misordered_pairs(training_pairs)
+    performance_on_testing_pairs_before_training = nn.count_misordered_pairs(testing_pairs)
+
+    print("\nPerformance on test set before training:", performance_on_testing_pairs_before_training)
+
+    training_errors = [performance_on_training_pairs_before_training]
+    testing_errors = [performance_on_testing_pairs_before_training]
+
     for i in range(epochs):
-        # Running 25 epochs, measuring testing performance after each round of training.
-        # Training
-        training_errors.append(nn.train(training_patterns, iterations=1)[0])
-        # Check ANN performance after training.
-        testing_errors.append(nn.count_misordered_pairs(testing_patterns))
-        j = i
-        print('\nTraining error epoch %d:' % (j+1), training_errors[j])
-        print('Testing error epoch %d:' % (j+1), testing_errors[j])
+        training_errors.append(nn.train(training_pairs, iterations=1)[0])
+        testing_errors.append(nn.count_misordered_pairs(testing_pairs))  # Check ANN performance after training.
+
+        print('\nTraining error epoch %d:' % (i+1), training_errors[i])
+        print('Testing error epoch %d:' % (i+1), testing_errors[i])
 
     b = time.time()
 
@@ -168,9 +176,9 @@ def run_rank(training_set, test_set, learning_rate=0.001, epochs=25):
     return training_errors, testing_errors
 
 
-def average_run_rank(training_set, test_set, learning_rate=0.001, epochs=25, runs=5):
+def average_run_ranknet(training_set, test_set, learning_rate=0.001, epochs=25, runs=5):
     """
-    Does a few runs of the run_rank algorithm and averages the results
+    Does a few runs of the run_ranknet algorithm with the same parameters and averages the results.
 
     :param training_set:
     :param test_set:
@@ -185,7 +193,7 @@ def average_run_rank(training_set, test_set, learning_rate=0.001, epochs=25, run
 
     for i in range(runs):
         print("\nRun %d of %d" % (i+1, runs))
-        x, y = run_rank(training_set, test_set, learning_rate, epochs)
+        x, y = run_ranknet(training_set, test_set, learning_rate, epochs)
         training_error_rates.append(x)
         testing_error_rates.append(y)
 
@@ -198,4 +206,4 @@ if __name__ == '__main__':
     print("Running")
 
     #plot_errors([0.5, 0.75, 0.3]*5, [0.2, 0.8, 0.6]*5)
-    average_run_rank("data_sets/train.txt", "data_sets/test.txt", learning_rate=0.001, epochs=10, runs=1)
+    average_run_ranknet("data_sets/train.txt", "data_sets/test.txt", learning_rate=0.001, epochs=2, runs=2)
