@@ -205,5 +205,4 @@ def average_run_ranknet(training_set, test_set, learning_rate=0.001, epochs=25, 
 if __name__ == '__main__':
     print("Running")
 
-    #plot_errors([0.5, 0.75, 0.3]*5, [0.2, 0.8, 0.6]*5)
     average_run_ranknet("data_sets/train.txt", "data_sets/test.txt", learning_rate=0.001, epochs=2, runs=2)
