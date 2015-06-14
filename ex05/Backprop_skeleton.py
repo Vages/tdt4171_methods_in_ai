@@ -180,9 +180,7 @@ class NN:
 
         for h in range(self.num_hidden):
             self.w_h_o[h] += self.learning_rate * (self.delta_o_a * self.out_h_a[h] - self.delta_o_b * self.out_h_b[h])
-        # TODO: Update the weights of the network using the deltas (see exercise text)
 
-        pass
 
     def back_propagate(self):
         self.compute_output_delta()
