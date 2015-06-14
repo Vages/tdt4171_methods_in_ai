@@ -181,7 +181,6 @@ class NN:
         for h in range(self.num_hidden):
             self.w_h_o[h] += self.learning_rate * (self.delta_o_a * self.out_h_a[h] - self.delta_o_b * self.out_h_b[h])
 
-
     def back_propagate(self):
         self.compute_output_delta()
         self.compute_hidden_delta()
