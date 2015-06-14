@@ -1,4 +1,3 @@
-__author__ = 'kaiolae'
 import time
 
 import matplotlib.pyplot as plt
